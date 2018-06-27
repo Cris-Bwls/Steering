@@ -3,7 +3,6 @@
 #include "Renderer2D.h"
 #include <vector>
 #include "Vector2.h"
-#include "Heap.h"
 
 struct Node;
 
@@ -26,7 +25,7 @@ public:
 
 	Node* m_pNodes[GRID_SIZE][GRID_SIZE];
 
-	Heap<Node*> m_OpenList;
+	std::vector<Node*> m_OpenList;
 	bool m_ClosedList[GRID_SIZE][GRID_SIZE];
 };
 

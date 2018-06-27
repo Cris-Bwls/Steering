@@ -52,7 +52,7 @@ Grid::Grid()
 			m_pNodes[x][y]->m_Costs[6] = 14;
 			m_pNodes[x][y]->m_Costs[7] = 14;
 
-			/// Cardinal
+			// Cardinal
 
 			// Up
 			if (y < GRID_SIZE - 1)
@@ -70,7 +70,7 @@ Grid::Grid()
 			if (x > 0)
 				m_pNodes[x][y]->m_pNeighbours[3] = m_pNodes[x - 1][y];
 
-			/// Diagonals
+			// Diagonals
 
 			// Top Right
 			if (y < GRID_SIZE - 1 && x < GRID_SIZE - 1)
@@ -98,21 +98,6 @@ Grid::Grid()
 		int y = rand() % GRID_SIZE;
 		m_pNodes[x][y]->m_bBlocked = true;
 	}
-	m_OpenList.SetCompareFunc(
-		[](Node* lhs, Node* rhs) 
-		{
-			auto lhsPos = lhs->m_v2Pos;
-			auto rhsPos = rhs->m_v2Pos;
-
-			float lhsMag2 = lhsPos.magnitudeSqr();
-			float rhsMag2 = lhsPos.magnitudeSqr();
-
-			if (lhsMag2 < rhsMag2)
-				return true;
-
-			return false;		
-		}
-	);
 }
 
 //--------------------------------------------------------------------------------
@@ -144,20 +129,20 @@ std::vector<Vector2> Grid::GetPath(Vector2 v2Start, Vector2 v2End, bool AStar)
 		return path;
 
 	//Pathfinding
-	m_OpenList.Clear();
+	m_OpenList.clear();
 	memset(m_ClosedList, 0, sizeof(bool) * GRID_SIZE * GRID_SIZE);
 
 	pStart->m_nGScore = 0;
 	pStart->m_pPrev = nullptr;
-	m_OpenList.Insert(pStart);
+	m_OpenList.push_back(pStart);
 
-	while (m_OpenList.Size() > 0)
+	while (m_OpenList.size() > 0)
 	{
 		SortOpenList();
 
 		// Remove lowest node from open list and add to closed list
 		Node* pCurrent = m_OpenList[0];
-		m_OpenList.Pop();
+		m_OpenList.erase(m_OpenList.begin());
 		m_ClosedList[pCurrent->m_nIndexX][pCurrent->m_nIndexY] = true;
 
 		//Complete path here
@@ -195,17 +180,7 @@ std::vector<Vector2> Grid::GetPath(Vector2 v2Start, Vector2 v2End, bool AStar)
 				continue;
 
 			//If neighbour is already in open list
-			bool bExists = false;
-			for (int i = 0; i < m_OpenList.Size(); ++i)
-			{
-				if (m_OpenList[i] == pNeighbour)
-				{
-					bExists = true;
-					break;
-				}
-			}
-
-			if (bExists)
+			if (std::find(m_OpenList.begin(), m_OpenList.end(), pNeighbour) != m_OpenList.end())
 			{
 				//Check if this is a better path
 				int newGScore = pCurrent->m_nGScore + pCurrent->m_Costs[i];
@@ -217,7 +192,7 @@ std::vector<Vector2> Grid::GetPath(Vector2 v2Start, Vector2 v2End, bool AStar)
 
 					pNeighbour->m_pPrev = pCurrent;
 
-					m_OpenList.Insert(pNeighbour);
+					m_OpenList.push_back(pNeighbour);
 				}
 			}
 			//ELSE add node to open list and calculate scores
@@ -249,7 +224,7 @@ std::vector<Vector2> Grid::GetPath(Vector2 v2Start, Vector2 v2End, bool AStar)
 
 				pNeighbour->m_pPrev = pCurrent;
 
-				m_OpenList.Insert(pNeighbour);
+				m_OpenList.push_back(pNeighbour);
 			}
 		}
 	}
@@ -284,9 +259,9 @@ Node* Grid::GetNodeByPos(Vector2 v2Pos)
 //--------------------------------------------------------------------------------
 void Grid::SortOpenList()
 {
-	for (int i = 0; i < m_OpenList.Size(); ++i)
+	for (int i = 0; i < m_OpenList.size(); ++i)
 	{
-		for (int j = 0; j < m_OpenList.Size() - 1; ++j)
+		for (int j = 0; j < m_OpenList.size() - 1; ++j)
 		{
 			if (m_OpenList[j]->m_nFScore > m_OpenList[j + 1]->m_nFScore)
 			{
