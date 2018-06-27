@@ -80,12 +80,12 @@ public:
 	// Remove
 	T Remove(int index)
 	{
-		HeapNode<T>* indexNode = m_Array.m_pData[index];
-		HeapNode<T>* lastNode = m_Array.m_pData[m_Array.Size() - 1];
+		HeapNode<T>* indexNode = m_Array[index];
+		HeapNode<T>* lastNode = m_Array[m_Array.Size() - 1];
 
 		T result = indexNode->m_data;
 		indexNode->m_data = lastNode->m_data;
-		delete m_Array.PopBack();
+		//delete m_Array.PopBack();
 
 		DownHeap(index);
 
@@ -112,7 +112,7 @@ public:
 	//--------------------------------------------------
 	int Size()
 	{
-		return m_Array.m_nUsed;
+		return m_Array.Size();
 	}
 
 	//--------------------------------------------------
@@ -124,7 +124,8 @@ public:
 	T& operator[] (int index)
 	{
 		//WRONG
-		return m_Array.m_pData[index];
+		HeapNode<T>* result = m_Array[index];
+		return result->m_data;
 	}
 
 	// Step
@@ -133,7 +134,7 @@ public:
 	// Clear
 	void Clear()
 	{
-		while (m_Array.Size > 0)
+		while (m_Array.Size() > 0)
 		{
 			delete m_Array.PopBack();
 		}
@@ -174,23 +175,23 @@ private:
 
 	void DownHeap(int index)
 	{
-		HeapNode<T>* dataNode = m_Array.m_pData[index];
+		HeapNode<T>* dataNode = m_Array[index];
 		HeapNode<T>* ChildNode1 = dataNode->m_pChild1;
 		HeapNode<T>* ChildNode2 = dataNode->m_pChild2;
 
 		bool bCanSwap = true;
 		while (bCanSwap)
 		{
-			if (CompareFunc(ChildNode1, ChildNode2))
+			if (ChildNode1 && (ChildNode2 == nullptr || CompareFunc(ChildNode1->m_data, ChildNode2->m_data)))
 			{
-				if (CompareFunc(ChildNode1, dataNode))
+				if (CompareFunc(ChildNode1->m_data, dataNode->m_data))
 				{
 					T temp = dataNode->m_data;
 					ChildNode1->m_data = dataNode->m_data;
 
 					dataNode = ChildNode1;
 				}
-				else if (CompareFunc(ChildNode2, dataNode))
+				else if (ChildNode2 && CompareFunc(ChildNode2->m_data, dataNode->m_data))
 				{
 					T temp = dataNode->m_data;
 					ChildNode2->m_data = dataNode->m_data;
@@ -204,14 +205,14 @@ private:
 			}
 			else
 			{
-				if (CompareFunc(ChildNode2, dataNode))
+				if (ChildNode2 && CompareFunc(ChildNode2->m_data, dataNode->m_data))
 				{
 					T temp = dataNode->m_data;
 					ChildNode2->m_data = dataNode->m_data;
 
 					dataNode = ChildNode2;
 				}
-				else if (CompareFunc(ChildNode1, dataNode))
+				else if (ChildNode1 && CompareFunc(ChildNode1->m_data, dataNode->m_data))
 				{
 					T temp = dataNode->m_data;
 					ChildNode1->m_data = dataNode->m_data;
@@ -231,10 +232,11 @@ private:
 
 	void UpHeap(int index)
 	{
-		HeapNode<T>* dataNode = m_Array.m_pData[index];
+		HeapNode<T>* dataNode = m_Array[index];
 		HeapNode<T>* parentNode = dataNode->m_pParent;
 
-		while (CompareFunc(dataNode, parentNode))
+		if (parentNode)
+		while (CompareFunc(dataNode->m_data, parentNode->m_data))
 		{
 			T temp = dataNode->m_data;
 			parentNode->m_data = dataNode->m_data;
@@ -243,7 +245,7 @@ private:
 			parentNode = dataNode->m_pParent;
 
 			if (!parentNode)
-				continue;
+				break;
 		}
 	}
 
