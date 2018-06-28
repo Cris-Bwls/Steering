@@ -92,6 +92,8 @@ Grid::Grid()
 		}
 	}
 
+	// Blocked Node Creation
+
 	for (int i = 0; i < BLOCKED_NODES; ++i)
 	{
 		int x = rand() % GRID_SIZE;
