@@ -248,10 +248,10 @@ Node* Grid::GetNodeByPos(Vector2 v2Pos)
 	if (y < 0)
 		return nullptr;
 
-	if (x >= OFFSET_X)
+	if (x >= NODE_SIZE)
 		return nullptr;
 
-	if (y >= OFFSET_Y)
+	if (y >= NODE_SIZE)
 		return nullptr;
 
 	return m_pNodes[x][y];
