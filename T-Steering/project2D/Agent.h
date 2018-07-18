@@ -31,7 +31,5 @@ protected:
 	float m_fMaxSpeed;
 
 	std::vector<BaseBehaviour*> m_BehaviourList;
-
-	float zoom = 1.0f;
 };
 
